@@ -1,0 +1,44 @@
+.cards-container {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 25px;
+
+    margin-bottom: 40px;
+}
+
+.card {
+    background: white;
+
+    width: 200px;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    text-align: center;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+
+    transition: .3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card-icon{
+    font-size:32px;
+    color:#2563eb;
+    margin-bottom:15px;
+}
+
+.card h3{
+    color:#555;
+}
+
+.card h1{
+    margin-top:10px;
+    color:#111827;
+}

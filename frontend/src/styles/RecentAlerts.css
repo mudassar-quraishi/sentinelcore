@@ -1,0 +1,29 @@
+.alerts-container{
+    background:white;
+    margin-top:30px;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+.alerts-container table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+.alerts-container th,
+.alerts-container td{
+    padding:12px;
+    border-bottom:1px solid #ddd;
+    text-align:left;
+}
+
+.alerts-container th{
+    background:#2563eb;
+    color:white;
+}
+
+.alerts-container tr:hover{
+    background:#f3f4f6;
+}
