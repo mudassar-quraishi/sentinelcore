@@ -1,3 +1,4 @@
+import { FaUsers } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
   FaHome,
@@ -100,6 +101,14 @@ function Sidebar() {
             Alert List
           </li>
 
+          {/* Users */}
+          <li
+            onClick={() => navigate("/users")}
+            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
+          >
+            <FaUsers />
+            Users
+          </li>
           {/* Reports */}
           <li
             onClick={() => navigate("/threat-list")}

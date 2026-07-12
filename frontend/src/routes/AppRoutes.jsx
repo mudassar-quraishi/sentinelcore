@@ -1,3 +1,6 @@
+import UserList from "../pages/UserList";
+import AddUser from "../pages/AddUser";
+import EditUser from "../pages/EditUser";
 import AddAlert from "../pages/AddAlert";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AlertList from "../pages/AlertList";
@@ -109,6 +112,33 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+            <Route
+          path="/users"
+          element={
+              <ProtectedRoute>
+                  <UserList />
+              </ProtectedRoute>
+          }
+      />
+
+      <Route
+          path="/add-user"
+          element={
+              <ProtectedRoute>
+                  <AddUser />
+              </ProtectedRoute>
+          }
+      />
+
+      <Route
+          path="/edit-user/:id"
+          element={
+              <ProtectedRoute>
+                  <EditUser />
+              </ProtectedRoute>
+          }
+      />
       </Routes>
     </BrowserRouter>
   );
