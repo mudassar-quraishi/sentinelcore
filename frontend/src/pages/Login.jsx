@@ -53,7 +53,7 @@ function Login() {
                 console.log("Status:", error.response.status);
                 console.log("Data:", error.response.data);
 
-                alert("Login Failed");
+                alert(error.response.data.message || "Login Failed");
 
             } else {
 
