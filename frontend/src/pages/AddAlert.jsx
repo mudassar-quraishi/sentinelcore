@@ -1,14 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 import api from "../services/api";
+
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import AnimatedBackground from "../components/AnimatedBackground";
+
+import GlassCard from "../components/ui/GlassCard";
+import PageHeader from "../components/ui/PageHeader";
+import PrimaryButton from "../components/ui/PrimaryButton";
+import ModernInput from "../components/ui/ModernInput";
+import ModernSelect from "../components/ui/ModernSelect";
+import FormSection from "../components/ui/FormSection";
 
 function AddAlert() {
 
     const navigate = useNavigate();
 
-    const [alert, setAlert] = useState({
+    const [alertData, setAlertData] = useState({
         title: "",
         severity: "",
         source: "",
@@ -20,7 +31,7 @@ function AddAlert() {
 
         try {
 
-            await api.post("/alerts", alert);
+            await api.post("/alerts", alertData);
 
             alert("Alert Added Successfully");
 
@@ -36,99 +47,210 @@ function AddAlert() {
 
     };
 
-    return (
-        <>
-            <Navbar />
-            <Sidebar />
+    return (<>
+    <Navbar />
+    <Sidebar />
 
-            <main className="ml-64 mt-16 p-8 bg-slate-100 min-h-screen">
+    <main className="ml-64 mt-16 min-h-screen bg-slate-950 relative overflow-hidden">
 
-                <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl">
+        <AnimatedBackground />
 
-                    <h1 className="text-3xl font-bold mb-6">
-                        Add Alert
-                    </h1>
+        <div className="relative z-10 p-8">
 
-                    <input
-                        type="text"
-                        placeholder="Alert Title"
-                        className="w-full border p-3 rounded mb-4"
-                        onChange={(e) =>
-                            setAlert({
-                                ...alert,
-                                title: e.target.value,
-                            })
-                        }
-                    />
+            <PageHeader
+                title="Add Alert"
+                subtitle="Create a new security alert"
+            />
 
-                    <select
-                        className="w-full border p-3 rounded mb-4"
-                        onChange={(e) =>
-                            setAlert({
-                                ...alert,
-                                severity: e.target.value,
-                            })
-                        }
-                    >
-                        <option value="">Select Severity</option>
-                        <option>Critical</option>
-                        <option>High</option>
-                        <option>Medium</option>
-                        <option>Low</option>
-                    </select>
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
 
-                    <input
-                        type="text"
-                        placeholder="Source"
-                        className="w-full border p-3 rounded mb-4"
-                        onChange={(e) =>
-                            setAlert({
-                                ...alert,
-                                source: e.target.value,
-                            })
-                        }
-                    />
+                <GlassCard className="max-w-5xl mx-auto p-10">
 
-                    <select
-                        className="w-full border p-3 rounded mb-4"
-                        onChange={(e) =>
-                            setAlert({
-                                ...alert,
-                                status: e.target.value,
-                            })
-                        }
-                    >
-                        <option value="">Select Status</option>
-                        <option>Open</option>
-                        <option>Investigating</option>
-                        <option>Resolved</option>
-                    </select>
+                    <FormSection>
 
-                    <textarea
-                        placeholder="Description"
-                        rows="4"
-                        className="w-full border p-3 rounded mb-6"
-                        onChange={(e) =>
-                            setAlert({
-                                ...alert,
-                                description: e.target.value,
-                            })
-                        }
-                    />
+                        {/* Alert Title */}
 
-                    <button
-                        onClick={saveAlert}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded"
-                    >
-                        Save Alert
-                    </button>
+                        <ModernSelect
+                            label="Alert Title"
+                            value={alertData.title}
+                            onChange={(e) =>
+                                setAlertData({
+                                    ...alertData,
+                                    title: e.target.value,
+                                })
+                            }
+                            options={[
+                                "Unauthorized Login",
+                                "Malware Detected",
+                                "SQL Injection",
+                                "XSS Attack",
+                                "DDoS Attack",
+                                "Phishing Attempt",
+                                "Privilege Escalation",
+                                "Suspicious File",
+                                "Port Scan",
+                                "Brute Force Attack",
+                            ]}
+                        />
 
-                </div>
+                        {/* Severity */}
 
-            </main>
+                        <ModernSelect
+                            label="Severity"
+                            value={alertData.severity}
+                            onChange={(e) =>
+                                setAlertData({
+                                    ...alertData,
+                                    severity: e.target.value,
+                                })
+                            }
+                            options={[
+                                "Critical",
+                                "High",
+                                "Medium",
+                                "Low",
+                            ]}
+                        />
 
-        </>
-    );
+                        {/* Source */}
+
+                        <ModernSelect
+                            label="Source"
+                            value={alertData.source}
+                            onChange={(e) =>
+                                setAlertData({
+                                    ...alertData,
+                                    source: e.target.value,
+                                })
+                            }
+                            options={[
+                                "Firewall",
+                                "IDS",
+                                "IPS",
+                                "SIEM",
+                                "EDR",
+                                "XDR",
+                                "Antivirus",
+                                "Threat Intelligence Feed",
+                                "Cloud Security",
+                                "Manual Investigation",
+                            ]}
+                        />
+
+                        {/* Status */}
+
+                        <ModernSelect
+                            label="Status"
+                            value={alertData.status}
+                            onChange={(e) =>
+                                setAlertData({
+                                    ...alertData,
+                                    status: e.target.value,
+                                })
+                            }
+                            options={[
+                                "Open",
+                                "Investigating",
+                                "Resolved",
+                            ]}
+                        />
+
+                    </FormSection>
+
+                    {/* Description */}
+
+                    <div className="mt-8">
+
+                        <label className="block text-cyan-400 text-sm font-medium mb-2">
+                            Description
+                        </label>
+
+                        <textarea
+                            rows="5"
+                            value={alertData.description}
+                            onChange={(e) =>
+                                setAlertData({
+                                    ...alertData,
+                                    description: e.target.value,
+                                })
+                            }
+                            placeholder="Enter alert description..."
+                            className="
+                                w-full
+                                rounded-xl
+                                bg-slate-800
+                                border
+                                border-slate-700
+                                px-5
+                                py-4
+                                text-white
+                                placeholder:text-slate-500
+                                focus:border-cyan-400
+                                focus:ring-2
+                                focus:ring-cyan-500/30
+                                outline-none
+                                resize-none
+                            "
+                        />
+
+                    </div>
+
+                    {/* Buttons */}
+
+                    <div className="flex justify-end gap-4 mt-10">
+
+                        <PrimaryButton
+                            onClick={() =>
+                                setAlertData({
+                                    title: "",
+                                    severity: "",
+                                    source: "",
+                                    status: "",
+                                    description: "",
+                                })
+                            }
+                            className="
+                                bg-slate-700
+                                hover:bg-slate-600
+                                text-white
+                            "
+                        >
+                            Reset
+                        </PrimaryButton>
+
+                        <PrimaryButton
+                            onClick={saveAlert}
+                            className="
+                                bg-gradient-to-r
+                                from-red-600
+                                via-orange-500
+                                to-yellow-500
+                                hover:from-red-500
+                                hover:to-yellow-400
+                                text-white
+                                shadow-xl
+                            "
+                        >
+                            🚨 Save Alert
+                        </PrimaryButton>
+
+                    </div>
+
+                </GlassCard>
+
+            </motion.div>
+
+        </div>
+
+    </main>
+
+</>
+);
+
 }
 
 export default AddAlert;

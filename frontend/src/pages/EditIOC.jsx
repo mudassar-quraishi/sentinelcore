@@ -1,24 +1,40 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+
 import api from "../services/api";
+
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import AnimatedBackground from "../components/AnimatedBackground";
+
+import GlassCard from "../components/ui/GlassCard";
+import PageHeader from "../components/ui/PageHeader";
+import PrimaryButton from "../components/ui/PrimaryButton";
+import ModernInput from "../components/ui/ModernInput";
+import ModernSelect from "../components/ui/ModernSelect";
+import FormSection from "../components/ui/FormSection";
 
 function EditIOC() {
 
     const { id } = useParams();
+
     const navigate = useNavigate();
 
     const [ioc, setIOC] = useState({
+
         type: "",
         value: "",
         riskLevel: "",
         source: "",
         status: "",
+
     });
 
     useEffect(() => {
+
         loadIOC();
+
     }, []);
 
     const loadIOC = async () => {
@@ -59,97 +75,169 @@ function EditIOC() {
 
     };
 
-    return (
-        <>
-            <Navbar />
-            <Sidebar />
+    return (<>
+    <Navbar />
+    <Sidebar />
 
-            <main className="ml-64 mt-16 p-8 bg-slate-100 min-h-screen">
+    <main className="ml-64 mt-16 min-h-screen bg-slate-950 relative overflow-hidden">
 
-                <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl">
+        <AnimatedBackground />
 
-                    <h1 className="text-3xl font-bold mb-6">
-                        Edit IOC
-                    </h1>
+        <div className="relative z-10 p-8">
 
-                    <input
-                        className="w-full border p-3 rounded mb-4"
-                        value={ioc.type}
-                        onChange={(e) =>
-                            setIOC({
-                                ...ioc,
-                                type: e.target.value,
-                            })
-                        }
-                    />
+            <PageHeader
+                title="Edit IOC"
+                subtitle="Update Indicator of Compromise"
+            />
 
-                    <input
-                        className="w-full border p-3 rounded mb-4"
-                        value={ioc.value}
-                        onChange={(e) =>
-                            setIOC({
-                                ...ioc,
-                                value: e.target.value,
-                            })
-                        }
-                    />
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
 
-                    <select
-                        className="w-full border p-3 rounded mb-4"
-                        value={ioc.riskLevel}
-                        onChange={(e) =>
-                            setIOC({
-                                ...ioc,
-                                riskLevel: e.target.value,
-                            })
-                        }
-                    >
-                        <option value="">Select Risk Level</option>
-                        <option>Critical</option>
-                        <option>High</option>
-                        <option>Medium</option>
-                        <option>Low</option>
-                    </select>
+                <GlassCard className="max-w-5xl mx-auto p-10">
 
-                    <input
-                        className="w-full border p-3 rounded mb-4"
-                        value={ioc.source}
-                        onChange={(e) =>
-                            setIOC({
-                                ...ioc,
-                                source: e.target.value,
-                            })
-                        }
-                    />
+                    <FormSection>
 
-                    <select
-                        className="w-full border p-3 rounded mb-6"
-                        value={ioc.status}
-                        onChange={(e) =>
-                            setIOC({
-                                ...ioc,
-                                status: e.target.value,
-                            })
-                        }
-                    >
-                        <option value="">Select Status</option>
-                        <option>Active</option>
-                        <option>Blocked</option>
-                        <option>Investigating</option>
-                    </select>
+                        <ModernSelect
+                            label="IOC Type"
+                            value={ioc.type}
+                            onChange={(e) =>
+                                setIOC({
+                                    ...ioc,
+                                    type: e.target.value,
+                                })
+                            }
+                            options={[
+                                "IP Address",
+                                "Domain",
+                                "URL",
+                                "Email Address",
+                                "MD5 Hash",
+                                "SHA1 Hash",
+                                "SHA256 Hash",
+                                "Registry Key",
+                                "Mutex",
+                                "File Path",
+                                "Process Name",
+                            ]}
+                        />
 
-                    <button
-                        onClick={updateIOC}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded"
-                    >
-                        Update IOC
-                    </button>
+                        <ModernSelect
+                            label="Risk Level"
+                            value={ioc.riskLevel}
+                            onChange={(e) =>
+                                setIOC({
+                                    ...ioc,
+                                    riskLevel: e.target.value,
+                                })
+                            }
+                            options={[
+                                "Critical",
+                                "High",
+                                "Medium",
+                                "Low",
+                            ]}
+                        />
 
-                </div>
+                        <div className="md:col-span-2">
 
-            </main>
-        </>
-    );
+                            <ModernInput
+                                label="IOC Value"
+                                value={ioc.value}
+                                onChange={(e) =>
+                                    setIOC({
+                                        ...ioc,
+                                        value: e.target.value,
+                                    })
+                                }
+                            />
+
+                        </div>
+
+                        <ModernSelect
+                            label="Source"
+                            value={ioc.source}
+                            onChange={(e) =>
+                                setIOC({
+                                    ...ioc,
+                                    source: e.target.value,
+                                })
+                            }
+                            options={[
+                                "Firewall",
+                                "IDS",
+                                "IPS",
+                                "SIEM",
+                                "EDR",
+                                "XDR",
+                                "Antivirus",
+                                "Threat Intelligence Feed",
+                                "Cloud Security",
+                                "Manual Investigation",
+                            ]}
+                        />
+
+                        <ModernSelect
+                            label="Status"
+                            value={ioc.status}
+                            onChange={(e) =>
+                                setIOC({
+                                    ...ioc,
+                                    status: e.target.value,
+                                })
+                            }
+                            options={[
+                                "Active",
+                                "Blocked",
+                                "Investigating",
+                            ]}
+                        />
+
+                    </FormSection>
+
+                    <div className="flex justify-end gap-4 mt-10">
+
+                        <PrimaryButton
+                            onClick={() => navigate("/ioc-list")}
+                            className="
+                                bg-slate-700
+                                hover:bg-slate-600
+                                text-white
+                            "
+                        >
+                            Cancel
+                        </PrimaryButton>
+
+                        <PrimaryButton
+                            onClick={updateIOC}
+                            className="
+                                bg-gradient-to-r
+                                from-emerald-600
+                                to-cyan-600
+                                hover:from-emerald-500
+                                hover:to-cyan-500
+                                text-white
+                                shadow-xl
+                            "
+                        >
+                            💾 Update IOC
+                        </PrimaryButton>
+
+                    </div>
+
+                </GlassCard>
+
+            </motion.div>
+
+        </div>
+
+    </main>
+
+</>
+);
+
 }
 
 export default EditIOC;

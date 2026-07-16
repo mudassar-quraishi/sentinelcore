@@ -1,152 +1,151 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import api from "../services/api";
 
 function RecentThreats() {
 
-    const [threats, setThreats] = useState([]);
+  const [threats, setThreats] = useState([]);
 
-    useEffect(() => {
-        fetchRecentThreats();
-    }, []);
+  useEffect(() => {
+    fetchRecentThreats();
+  }, []);
 
-    const fetchRecentThreats = async () => {
-        try {
-            const response = await api.get("/dashboard/recent-threats");
-            setThreats(response.data);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+  const fetchRecentThreats = async () => {
+    try {
+      const response = await api.get("/dashboard/recent-threats");
+      setThreats(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    const getSeverityBadge = (severity) => {
+  const severityColor = (severity) => {
+    switch (severity) {
+      case "Critical":
+        return "bg-red-500/20 text-red-400";
+      case "High":
+        return "bg-orange-500/20 text-orange-400";
+      case "Medium":
+        return "bg-yellow-500/20 text-yellow-300";
+      case "Low":
+        return "bg-green-500/20 text-green-400";
+      default:
+        return "bg-slate-700 text-white";
+    }
+  };
 
-        switch (severity) {
+  const statusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case "open":
+        return "bg-blue-500/20 text-blue-400";
+      case "resolved":
+      case "closed":
+      case "close":
+        return "bg-green-500/20 text-green-400";
+      default:
+        return "bg-slate-600 text-white";
+    }
+  };
 
-            case "Critical":
-                return "bg-red-600 text-white";
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl p-6"
+    >
 
-            case "High":
-                return "bg-orange-500 text-white";
+      <div className="flex justify-between items-center mb-6">
 
-            case "Medium":
-                return "bg-yellow-400 text-black";
+        <div>
 
-            case "Low":
-                return "bg-green-500 text-white";
+          <h2 className="text-2xl font-bold text-white">
+            Recent Threats
+          </h2>
 
-            default:
-                return "bg-gray-500 text-white";
-        }
-    };
-
-    const getStatusBadge = (status) => {
-
-        switch (status.toLowerCase()) {
-
-            case "open":
-                return "bg-blue-100 text-blue-700";
-
-            case "resolved":
-            case "close":
-            case "closed":
-                return "bg-green-100 text-green-700";
-
-            default:
-                return "bg-gray-100 text-gray-700";
-        }
-    };
-
-    return (
-
-        <div className="bg-white rounded-xl shadow-lg mt-8 p-6">
-
-            <h2 className="text-2xl font-bold mb-4">
-                Recent Threats
-            </h2>
-
-            <table className="w-full">
-
-                <thead className="bg-slate-800 text-white">
-
-                    <tr>
-
-                        <th className="p-3">ID</th>
-                        <th className="p-3">Title</th>
-                        <th className="p-3">Severity</th>
-                        <th className="p-3">Source</th>
-                        <th className="p-3">Status</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    {threats.length > 0 ? (
-
-                        threats.map((threat) => (
-
-                            <tr
-                                key={threat.id}
-                                className="border-b text-center hover:bg-gray-50"
-                            >
-
-                                <td className="p-3">{threat.id}</td>
-
-                                <td className="p-3">{threat.title}</td>
-
-                                <td className="p-3">
-
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityBadge(
-                                            threat.severity
-                                        )}`}
-                                    >
-                                        {threat.severity}
-                                    </span>
-
-                                </td>
-
-                                <td className="p-3">{threat.source}</td>
-
-                                <td className="p-3">
-
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(
-                                            threat.status
-                                        )}`}
-                                    >
-                                        {threat.status}
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-                        ))
-
-                    ) : (
-
-                        <tr>
-
-                            <td
-                                colSpan="5"
-                                className="text-center p-5 text-gray-500"
-                            >
-                                No Recent Threats
-                            </td>
-
-                        </tr>
-
-                    )}
-
-                </tbody>
-
-            </table>
+          <p className="text-slate-400 mt-1">
+            Latest detected cyber threats
+          </p>
 
         </div>
 
-    );
+        <span className="text-sky-400 font-semibold">
+          {threats.length} Records
+        </span>
+
+      </div>
+
+      <div className="overflow-x-auto">
+
+        <table className="w-full">
+
+          <thead>
+
+            <tr className="text-slate-400 border-b border-white/10">
+
+              <th className="py-4 text-left">ID</th>
+              <th className="text-left">Threat</th>
+              <th className="text-left">Severity</th>
+              <th className="text-left">Source</th>
+              <th className="text-left">Status</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {threats.map((threat) => (
+
+              <tr
+                key={threat.id}
+                className="border-b border-white/5 hover:bg-white/5 transition"
+              >
+
+                <td className="py-5 text-white">
+                  #{threat.id}
+                </td>
+
+                <td className="font-medium text-white">
+                  {threat.title}
+                </td>
+
+                <td>
+
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${severityColor(threat.severity)}`}
+                  >
+                    {threat.severity}
+                  </span>
+
+                </td>
+
+                <td className="text-slate-300">
+                  {threat.source}
+                </td>
+
+                <td>
+
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColor(threat.status)}`}
+                  >
+                    {threat.status}
+                  </span>
+
+                </td>
+
+              </tr>
+
+            ))}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </motion.div>
+  );
 }
 
 export default RecentThreats;

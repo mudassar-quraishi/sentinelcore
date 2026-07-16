@@ -15,6 +15,7 @@ import IOCList from "../pages/IOCList";
 import EditIOC from "../pages/EditIOC";
 import EditAlert from "../pages/EditAlert";
 import ProtectedRoute from "./ProtectedRoute";
+import Reports from "../pages/Reports";
 
 function AppRoutes() {
   return (
@@ -141,6 +142,15 @@ function AppRoutes() {
               </ProtectedRoute>
           }
       />
+
+      <Route
+    path="/reports"
+    element={
+        <ProtectedRoute>
+            <Reports />
+        </ProtectedRoute>
+    }
+/>
       </Routes>
     </BrowserRouter>
   );

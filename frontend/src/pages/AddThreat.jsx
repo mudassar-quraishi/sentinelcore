@@ -1,5 +1,15 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
+
 import api from "../services/api";
+
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
+import AnimatedBackground from "../components/AnimatedBackground";
+
+import GlassCard from "../components/ui/GlassCard";
+import PageHeader from "../components/ui/PageHeader";
+import PrimaryButton from "../components/ui/PrimaryButton";
 
 function AddThreat() {
 
@@ -38,60 +48,251 @@ function AddThreat() {
 
     return (
 
-        <div className="ml-64 mt-16 p-8">
+        <>
+            <Navbar />
+            <Sidebar />
 
-            <div className="bg-white p-8 rounded-xl shadow-lg max-w-xl">
+            <main className="ml-64 mt-16 min-h-screen bg-slate-950 relative overflow-hidden">
 
-                <h1 className="text-3xl font-bold mb-6">
-                    Add New Threat
-                </h1>
+                <AnimatedBackground />
 
-                <input
-                    className="w-full border p-3 rounded mb-4"
-                    placeholder="Threat Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
+                <div className="relative z-10 p-8">
 
-                <select
-                    className="w-full border p-3 rounded mb-4"
-                    value={severity}
-                    onChange={(e) => setSeverity(e.target.value)}
-                >
-                    <option value="">Select Severity</option>
-                    <option>Critical</option>
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
-                </select>
+                    <PageHeader
+                        title="Add Threat"
+                        subtitle="Create a new cyber threat record"
+                    />
 
-                <input
-                    className="w-full border p-3 rounded mb-4"
-                    placeholder="Source"
-                    value={source}
-                    onChange={(e) => setSource(e.target.value)}
-                />
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
 
-                <select
-                    className="w-full border p-3 rounded mb-6"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                >
-                    <option value="">Select Status</option>
-                    <option>Open</option>
-                    <option>Resolved</option>
-                </select>
+                        <GlassCard className="max-w-4xl mx-auto p-10">
 
-                <button
-                    onClick={saveThreat}
-                    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
-                >
-                    Add Threat
-                </button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-            </div>
+                                {/* Threat Title */}
 
-        </div>
+                                <div className="relative md:col-span-2">
+
+                                    <select
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        className="
+                                            w-full
+                                            rounded-xl
+                                            bg-slate-800
+                                            border
+                                            border-slate-700
+                                            px-5
+                                            pt-7
+                                            pb-3
+                                            text-white
+                                            focus:border-cyan-400
+                                            focus:ring-2
+                                            focus:ring-cyan-500/30
+                                            outline-none
+                                        "
+                                    >
+
+                                        <option value="">Select Threat</option>
+
+                                        <option>SQL Injection</option>
+                                        <option>XSS Attack</option>
+                                        <option>Ransomware</option>
+                                        <option>DDoS Attack</option>
+                                        <option>Malware</option>
+                                        <option>Phishing</option>
+                                        <option>Brute Force</option>
+                                        <option>Zero-Day Exploit</option>
+                                        <option>Privilege Escalation</option>
+
+                                    </select>
+
+                                    <label className="absolute left-5 top-2 text-xs font-medium text-cyan-400">
+
+                                        Threat Title
+
+                                    </label>
+
+                                </div>
+
+                                {/* Severity */}
+
+                                <div className="relative">
+
+                                    <select
+                                        value={severity}
+                                        onChange={(e) => setSeverity(e.target.value)}
+                                        className="
+                                            w-full
+                                            rounded-xl
+                                            bg-slate-800
+                                            border
+                                            border-slate-700
+                                            px-5
+                                            pt-7
+                                            pb-3
+                                            text-white
+                                            focus:border-cyan-400
+                                            focus:ring-2
+                                            focus:ring-cyan-500/30
+                                            outline-none
+                                        "
+                                    >
+
+                                        <option value="">Select Severity</option>
+
+                                        <option>Critical</option>
+                                        <option>High</option>
+                                        <option>Medium</option>
+                                        <option>Low</option>
+
+                                    </select>
+
+                                    <label className="absolute left-5 top-2 text-xs font-medium text-cyan-400">
+
+                                        Severity
+
+                                    </label>
+
+                                </div>                                {/* Status */}
+
+                                <div className="relative">
+
+                                    <select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                        className="
+                                            w-full
+                                            rounded-xl
+                                            bg-slate-800
+                                            border
+                                            border-slate-700
+                                            px-5
+                                            pt-7
+                                            pb-3
+                                            text-white
+                                            focus:border-cyan-400
+                                            focus:ring-2
+                                            focus:ring-cyan-500/30
+                                            outline-none
+                                        "
+                                    >
+
+                                        <option value="">Select Status</option>
+
+                                        <option>Open</option>
+                                        <option>In Progress</option>
+                                        <option>Resolved</option>
+
+                                    </select>
+
+                                    <label className="absolute left-5 top-2 text-xs font-medium text-cyan-400">
+
+                                        Status
+
+                                    </label>
+
+                                </div>
+
+                                {/* Source */}
+
+                                <div className="relative md:col-span-2">
+
+                                    <select
+                                        value={source}
+                                        onChange={(e) => setSource(e.target.value)}
+                                        className="
+                                            w-full
+                                            rounded-xl
+                                            bg-slate-800
+                                            border
+                                            border-slate-700
+                                            px-5
+                                            pt-7
+                                            pb-3
+                                            text-white
+                                            focus:border-cyan-400
+                                            focus:ring-2
+                                            focus:ring-cyan-500/30
+                                            outline-none
+                                        "
+                                    >
+
+                                        <option value="">Select Source</option>
+
+                                        <option>Firewall</option>
+                                        <option>IDS</option>
+                                        <option>IPS</option>
+                                        <option>SIEM</option>
+                                        <option>Antivirus</option>
+                                        <option>Endpoint Security</option>
+                                        <option>Email Gateway</option>
+                                        <option>Threat Intelligence Feed</option>
+                                        <option>Cloud Security</option>
+                                        <option>Manual Investigation</option>
+
+                                    </select>
+
+                                    <label className="absolute left-5 top-2 text-xs font-medium text-cyan-400">
+
+                                        Threat Source
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            {/* Action Buttons */}
+
+                            <div className="flex justify-end gap-4 mt-10">
+
+                                <PrimaryButton
+                                    onClick={() => {
+                                        setTitle("");
+                                        setSeverity("");
+                                        setSource("");
+                                        setStatus("");
+                                    }}
+                                    className="
+                                        bg-slate-700
+                                        hover:bg-slate-600
+                                        text-white
+                                    "
+                                >
+                                    Reset
+                                </PrimaryButton>
+
+                                <PrimaryButton
+                                    onClick={saveThreat}
+                                    className="
+                                        bg-gradient-to-r
+                                        from-cyan-600
+                                        to-blue-600
+                                        hover:from-cyan-500
+                                        hover:to-blue-500
+                                        text-white
+                                        shadow-xl
+                                    "
+                                >
+                                    🚀 Add Threat
+                                </PrimaryButton>
+
+                            </div>
+
+                        </GlassCard>
+
+                    </motion.div>
+
+                </div>
+
+            </main>
+
+        </>
 
     );
 

@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 import api from "../services/api";
+
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import AnimatedBackground from "../components/AnimatedBackground";
+
+import PageHeader from "../components/ui/PageHeader";
+import GlassCard from "../components/ui/GlassCard";
+import TableContainer from "../components/ui/TableContainer";
 
 function UserList() {
 
@@ -10,8 +18,14 @@ function UserList() {
 
     const [users, setUsers] = useState([]);
 
+    const [search, setSearch] = useState("");
+
+    const [roleFilter, setRoleFilter] = useState("All");
+
     useEffect(() => {
+
         fetchUsers();
+
     }, []);
 
     const fetchUsers = async () => {
@@ -34,17 +48,12 @@ function UserList() {
 
     const deleteUser = async (id) => {
 
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this user?"
-        );
-
-        if (!confirmDelete) return;
+        if (!window.confirm("Delete this user?"))
+            return;
 
         try {
 
             await api.delete(`/users/${id}`);
-
-            alert("User deleted successfully");
 
             fetchUsers();
 
@@ -58,162 +67,358 @@ function UserList() {
 
     };
 
-    return (
+    const filteredUsers = users.filter((user) => {
 
-        <>
-            <Navbar />
-            <Sidebar />
+        const matchesSearch =
+            user.name.toLowerCase().includes(search.toLowerCase()) ||
+            user.email.toLowerCase().includes(search.toLowerCase());
 
-            <main className="ml-64 mt-16 p-8 bg-slate-100 min-h-screen">
+        const matchesRole =
+            roleFilter === "All" ||
+            user.role?.name === roleFilter;
 
-                <div className="flex justify-between items-center mb-6">
+        return matchesSearch && matchesRole;
 
-                    <h1 className="text-3xl font-bold text-slate-800">
-                        User Management
-                    </h1>
+    });
+
+    const getRoleBadge = (role) => {
+
+        switch (role) {
+
+            case "ADMIN":
+                return "bg-red-500/20 text-red-400 border border-red-500/30";
+
+            case "ANALYST":
+                return "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30";
+
+            case "USER":
+                return "bg-blue-500/20 text-blue-400 border border-blue-500/30";
+
+            default:
+                return "bg-slate-700 text-white";
+
+        }
+
+    };
+
+    return (<>
+    <Navbar />
+    <Sidebar />
+
+    <main className="ml-64 mt-16 min-h-screen bg-slate-950 relative overflow-hidden">
+
+        <AnimatedBackground />
+
+        <div className="relative z-10 p-8">
+
+            <PageHeader
+                title="User Management"
+                subtitle="Manage users, roles and permissions"
+            />
+
+            {/* Search & Controls */}
+
+            <GlassCard className="p-6 mb-8">
+
+                <div className="flex flex-col lg:flex-row gap-5">
+
+                    <input
+                        type="text"
+                        placeholder="🔍 Search user..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="
+                            flex-1
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-xl
+                            px-5
+                            py-3
+                            text-white
+                            placeholder:text-slate-500
+                            focus:border-cyan-400
+                            focus:ring-2
+                            focus:ring-cyan-500/30
+                            outline-none
+                        "
+                    />
+
+                    <select
+                        value={roleFilter}
+                        onChange={(e) => setRoleFilter(e.target.value)}
+                        className="
+                            w-full
+                            lg:w-52
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-xl
+                            px-5
+                            py-3
+                            text-white
+                            outline-none
+                            focus:border-cyan-400
+                        "
+                    >
+                        <option value="All">All Roles</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="ANALYST">ANALYST</option>
+                        <option value="USER">USER</option>
+                    </select>
 
                     <button
                         onClick={() => navigate("/add-user")}
-                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg shadow"
+                        className="
+                            px-6
+                            py-3
+                            rounded-xl
+                            bg-gradient-to-r
+                            from-emerald-600
+                            to-cyan-600
+                            text-white
+                            font-semibold
+                            hover:scale-105
+                            transition
+                            shadow-xl
+                        "
                     >
-                        + Add User
+                        ➕ Add User
                     </button>
 
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            </GlassCard>
 
-                    <table className="w-full">
+            {/* Users Table */}
 
-                        <thead className="bg-slate-900 text-white">
+            <TableContainer>
 
-                            <tr>
+                <table className="w-full">
 
-                                <th className="p-4">ID</th>
+                    <thead className="bg-slate-950 text-slate-300 uppercase tracking-wider">
 
-                                <th className="p-4">Name</th>
+                        <tr>
 
-                                <th className="p-4">Email</th>
+                            <th className="p-4">User</th>
 
-                                <th className="p-4">Role</th>
+                            <th className="p-4">Email</th>
 
-                                <th className="p-4">Status</th>
+                            <th className="p-4">Role</th>
 
-                                <th className="p-4">Actions</th>
+                            <th className="p-4">Status</th>
 
-                            </tr>
+                            <th className="p-4">Actions</th>
 
-                        </thead>
+                        </tr>
 
-                        <tbody>
+                    </thead>
 
-                            {users.length > 0 ? (
+                    <tbody>
 
-                                users.map((user) => (
+                        {filteredUsers.length > 0 ? (
 
-                                    <tr
-                                        key={user.id}
-                                        className="border-b hover:bg-gray-50 text-center"
-                                    >
+                            filteredUsers.map((user, index) => (
 
-                                        <td className="p-4">
-                                            {user.id}
-                                        </td>
+                                <motion.tr
 
-                                        <td className="p-4">
-                                            {user.name}
-                                        </td>
+                                    key={user.id}
 
-                                        <td className="p-4">
-                                            {user.email}
-                                        </td>
+                                    initial={{
+                                        opacity: 0,
+                                        y: 20,
+                                    }}
 
-                                        <td className="p-4">
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                    }}
 
-                                            <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-semibold">
+                                    transition={{
+                                        delay: index * 0.05,
+                                    }}
 
-                                                {user.role?.name}
+                                    className="
+                                        border-b
+                                        border-slate-800
+                                        hover:bg-slate-800/40
+                                        transition-all
+                                    "
 
-                                            </span>
+                                >
 
-                                        </td>
+                                    {/* Avatar + Name */}
 
-                                        <td className="p-4">
+                                    <td className="p-5">
 
-                                            {user.enabled ? (
+                                        <div className="flex items-center gap-4">
 
-                                                <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
-
-                                                    Active
-
-                                                </span>
-
-                                            ) : (
-
-                                                <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 font-semibold">
-
-                                                    Disabled
-
-                                                </span>
-
-                                            )}
-
-                                        </td>
-
-                                        <td className="p-4">
-
-                                            <button
-                                                onClick={() =>
-                                                    navigate(`/edit-user/${user.id}`)
-                                                }
-                                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mr-2"
+                                            <div
+                                                className="
+                                                    w-12
+                                                    h-12
+                                                    rounded-full
+                                                    bg-gradient-to-r
+                                                    from-cyan-500
+                                                    to-blue-600
+                                                    flex
+                                                    items-center
+                                                    justify-center
+                                                    text-white
+                                                    font-bold
+                                                    text-lg
+                                                "
                                             >
-                                                Edit
-                                            </button>
+                                                {user.name.charAt(0).toUpperCase()}
+                                            </div>
 
-                                            <button
-                                                onClick={() =>
-                                                    deleteUser(user.id)
-                                                }
-                                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-                                            >
-                                                Delete
-                                            </button>
+                                            <div>
 
-                                        </td>
+                                                <p className="text-white font-semibold">
 
-                                    </tr>
+                                                    {user.name}
 
-                                ))
+                                                </p>
 
-                            ) : (
+                                                <p className="text-slate-500 text-sm">
 
-                                <tr>
+                                                    ID #{user.id}
 
-                                    <td
-                                        colSpan="6"
-                                        className="p-8 text-center text-gray-500"
-                                    >
+                                                </p>
 
-                                        No Users Found
+                                            </div>
+
+                                        </div>
 
                                     </td>
 
-                                </tr>
+                                    {/* Email */}
 
-                            )}
+                                    <td className="p-5 text-slate-300">
 
-                        </tbody>
+                                        {user.email}
 
-                    </table>
+                                    </td>
 
-                </div>
+                                    {/* Role */}
 
-            </main>
+                                    <td className="p-5">
 
-        </>
+                                        <span
+                                            className={`
+                                                px-4
+                                                py-2
+                                                rounded-full
+                                                text-sm
+                                                font-semibold
+                                                ${getRoleBadge(user.role?.name)}
+                                            `}
+                                        >
+                                            {user.role?.name}
+                                        </span>
 
-    );
+                                    </td>
+
+                                    {/* Status */}
+
+                                    <td className="p-5">
+
+                                        {user.enabled ? (
+
+                                            <span className="px-4 py-2 rounded-full bg-green-500/20 text-green-400 font-semibold">
+
+                                                Active
+
+                                            </span>
+
+                                        ) : (
+
+                                            <span className="px-4 py-2 rounded-full bg-red-500/20 text-red-400 font-semibold">
+
+                                                Disabled
+
+                                            </span>
+
+                                        )}
+
+                                    </td>
+
+                                    {/* Actions */}
+
+                                    <td className="p-5">
+
+                                        <button
+                                            onClick={() =>
+                                                navigate(`/edit-user/${user.id}`)
+                                            }
+                                            className="
+                                                px-4
+                                                py-2
+                                                rounded-xl
+                                                bg-gradient-to-r
+                                                from-blue-600
+                                                to-cyan-500
+                                                text-white
+                                                mr-3
+                                                hover:scale-105
+                                                transition
+                                            "
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            onClick={() =>
+                                                deleteUser(user.id)
+                                            }
+                                            className="
+                                                px-4
+                                                py-2
+                                                rounded-xl
+                                                bg-gradient-to-r
+                                                from-red-600
+                                                to-red-500
+                                                text-white
+                                                hover:scale-105
+                                                transition
+                                            "
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </td>
+
+                                </motion.tr>
+
+                            ))
+
+                        ) : (
+
+                            <tr>
+
+                                <td
+                                    colSpan="5"
+                                    className="py-12 text-center text-slate-500"
+                                >
+                                    No Users Found
+                                </td>
+
+                            </tr>
+
+                        )}
+
+                    </tbody>
+
+                </table>
+
+            </TableContainer>
+
+        </div>
+
+    </main>
+
+</>
+);
 
 }
 

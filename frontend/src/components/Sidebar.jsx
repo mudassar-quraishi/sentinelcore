@@ -1,6 +1,5 @@
-import { FaUsers } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import {
+  FaUsers,
   FaHome,
   FaShieldAlt,
   FaPlusCircle,
@@ -10,130 +9,175 @@ import {
   FaCog,
   FaList,
   FaBell,
+  FaCircle,
 } from "react-icons/fa";
+
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 
 function Sidebar() {
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const role = localStorage.getItem("role");
 
+  const menu = [
+    {
+      title: "Dashboard",
+      icon: <FaHome />,
+      path: "/dashboard",
+    },
+     {
+      title: "Add Threat",
+      icon: <FaPlusCircle />,
+      path: "/add-threat",
+    },
+    {
+      title: "Threat List",
+      icon: <FaShieldAlt />,
+      path: "/threat-list",
+    },
+   
+    {
+      title: "Add IOC",
+      icon: <FaSearch />,
+      path: "/add-ioc",
+    },
+    {
+      title: "IOC List",
+      icon: <FaList />,
+      path: "/ioc-list",
+    },
+    {
+      title: "Add Alert",
+      icon: <FaBell />,
+      path: "/add-alert",
+    },
+    {
+      title: "Alert List",
+      icon: <FaExclamationTriangle />,
+      path: "/alert-list",
+    },
+    {
+      title: "Users",
+      icon: <FaUsers />,
+      path: "/users",
+    },
+    {
+      title: "Reports",
+      icon: <FaFileAlt />,
+      path: "/reports",
+    },
+  ];
+
   return (
+    <aside
+      className="
+        fixed
+        left-0
+        top-16
+        w-64
+        h-[calc(100vh-4rem)]
+        bg-slate-950/95
+        backdrop-blur-xl
+        border-r
+        border-white/10
+        text-white
+        flex
+        flex-col
+        overflow-y-auto
+        scrollbar-thin
+        scrollbar-thumb-slate-700
+        scrollbar-track-transparent
+        z-40
+      "
+    >
 
-    <aside className="fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] bg-slate-900 text-white shadow-lg">
+      {/* Logo */}
 
-      <div className="p-6 text-center border-b border-slate-700">
+      <div className="p-8 border-b border-white/10">
 
-        <h2 className="text-2xl font-bold text-cyan-400">
-          SentinelCore
-        </h2>
+        <h1 className="text-3xl font-bold text-sky-400">
+          🛡 SentinelCore
+        </h1>
 
-        <p className="text-xs text-gray-400 mt-2">
-          {role}
+        <p className="text-slate-400 text-sm mt-2">
+          Cyber Threat Intelligence
         </p>
 
       </div>
 
-      <nav className="mt-6">
+      {/* Menu */}
 
-        <ul className="space-y-2">
+      <div className="flex-1 mt-5 px-3 pb-6">
 
-          {/* Dashboard */}
-          <li
-            onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaHome />
-            Dashboard
-          </li>
+        {menu.map((item) => {
 
-          {/* Threat List */}
-          <li
-            onClick={() => navigate("/threat-list")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaShieldAlt />
-            Threat List
-          </li>
+          const active = location.pathname === item.path;
 
-          {/* Add Threat */}
-          <li
-            onClick={() => navigate("/add-threat")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaPlusCircle />
-            Add Threat
-          </li>
+          return (
 
-          {/* Add IOC */}
-          <li
-            onClick={() => navigate("/add-ioc")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaSearch />
-            Add IOC
-          </li>
+            <motion.div
+              key={item.title}
+              whileHover={{ x: 6 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate(item.path)}
+              className={`
+                flex items-center
+                gap-4
+                px-4
+                py-3
+                rounded-2xl
+                cursor-pointer
+                mb-2
+                transition-all
+                duration-300
 
-          {/* IOC List */}
-          <li
-            onClick={() => navigate("/ioc-list")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaList />
-            IOC List
-          </li>
-
-          {/* Add Alert */}
-          <li
-            onClick={() => navigate("/add-alert")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaBell />
-            Add Alert
-          </li>
-
-          {/* Alert List */}
-          <li
-            onClick={() => navigate("/alert-list")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaExclamationTriangle />
-            Alert List
-          </li>
-
-          {/* Users */}
-          <li
-            onClick={() => navigate("/users")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaUsers />
-            Users
-          </li>
-          {/* Reports */}
-          <li
-            onClick={() => navigate("/threat-list")}
-            className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
-          >
-            <FaFileAlt />
-            Reports
-          </li>
-
-          {/* Settings - ADMIN Only */}
-          {role === "ADMIN" && (
-            <li
-              className="flex items-center gap-3 px-6 py-3 hover:bg-slate-800 cursor-pointer transition"
+                ${
+                  active
+                    ? "bg-sky-500 text-white shadow-lg shadow-sky-500/30"
+                    : "hover:bg-slate-800 text-slate-300"
+                }
+              `}
             >
-              <FaCog />
-              Settings
-            </li>
-          )}
 
-        </ul>
+              <span className="text-lg">
+                {item.icon}
+              </span>
 
-      </nav>
+              <span className="font-medium">
+                {item.title}
+              </span>
+
+            </motion.div>
+
+          );
+        })}
+
+      </div>
+
+      {/* Footer */}
+
+      <div className="mt-auto p-6 border-t border-white/10">
+
+        <div className="flex items-center gap-2 text-emerald-400">
+
+          <FaCircle className="text-xs animate-pulse" />
+
+          <span className="text-sm">
+            System Online
+          </span>
+
+        </div>
+
+        <p className="text-slate-500 text-xs mt-3">
+          Role : {role}
+        </p>
+
+      </div>
 
     </aside>
-
   );
 }
 

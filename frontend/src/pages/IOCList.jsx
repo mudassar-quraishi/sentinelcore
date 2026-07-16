@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+
 import api from "../services/api";
+
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import { useNavigate } from "react-router-dom";
+import AnimatedBackground from "../components/AnimatedBackground";
+
+import GlassCard from "../components/ui/GlassCard";
+import PageHeader from "../components/ui/PageHeader";
+import TableContainer from "../components/ui/TableContainer";
 
 function IOCList() {
 
@@ -31,21 +39,14 @@ function IOCList() {
         }
 
     };
-        const deleteIOC = async (id) => {
 
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this IOC?"
-        );
+    const deleteIOC = async (id) => {
 
-        if (!confirmDelete) {
-            return;
-        }
+        if (!window.confirm("Delete this IOC?")) return;
 
         try {
 
             await api.delete(`/ioc/${id}`);
-
-            alert("IOC Deleted Successfully");
 
             fetchIOCs();
 
@@ -78,19 +79,19 @@ function IOCList() {
         switch (risk) {
 
             case "Critical":
-                return "bg-red-600 text-white";
+                return "bg-red-500/20 text-red-400 border border-red-500/30";
 
             case "High":
-                return "bg-orange-500 text-white";
+                return "bg-orange-500/20 text-orange-400 border border-orange-500/30";
 
             case "Medium":
-                return "bg-yellow-400 text-black";
+                return "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30";
 
             case "Low":
-                return "bg-green-500 text-white";
+                return "bg-green-500/20 text-green-400 border border-green-500/30";
 
             default:
-                return "bg-gray-500 text-white";
+                return "bg-slate-700 text-white";
 
         }
 
@@ -101,162 +102,262 @@ function IOCList() {
         switch (status) {
 
             case "Active":
-                return "bg-green-100 text-green-700";
+                return "bg-green-500/20 text-green-400";
 
             case "Blocked":
-                return "bg-red-100 text-red-700";
+                return "bg-red-500/20 text-red-400";
 
             case "Investigating":
-                return "bg-yellow-100 text-yellow-700";
+                return "bg-yellow-500/20 text-yellow-300";
 
             default:
-                return "bg-gray-100 text-gray-700";
+                return "bg-slate-700 text-white";
 
         }
 
     };
 
-    return (
+    return (<>
+    <Navbar />
+    <Sidebar />
 
-        <>
-            <Navbar />
-            <Sidebar />
+    <main className="ml-64 mt-16 min-h-screen bg-slate-950 relative overflow-hidden">
 
-            <main className="ml-64 mt-16 p-8 bg-slate-100 min-h-screen">
+        <AnimatedBackground />
 
-                <h1 className="text-3xl font-bold mb-6">
-                    IOC List
-                </h1>
+        <div className="relative z-10 p-8">
 
-                <div className="mb-6 flex gap-4">
+            <PageHeader
+                title="IOC Management"
+                subtitle="Manage Indicators of Compromise"
+            />
+
+            {/* Search & Filter */}
+
+            <GlassCard className="p-6 mb-8">
+
+                <div className="flex flex-col lg:flex-row gap-5">
 
                     <input
                         type="text"
-                        placeholder="Search IOC..."
+                        placeholder="🔍 Search IOC..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full md:w-80 border rounded-lg px-4 py-2"
+                        className="
+                            flex-1
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-xl
+                            px-5
+                            py-3
+                            text-white
+                            placeholder:text-slate-500
+                            focus:border-cyan-400
+                            focus:ring-2
+                            focus:ring-cyan-500/30
+                            outline-none
+                        "
                     />
 
                     <select
                         value={riskFilter}
                         onChange={(e) => setRiskFilter(e.target.value)}
-                        className="border rounded-lg px-4 py-2"
+                        className="
+                            w-full
+                            lg:w-60
+                            bg-slate-800
+                            border
+                            border-slate-700
+                            rounded-xl
+                            px-5
+                            py-3
+                            text-white
+                            focus:border-cyan-400
+                            outline-none
+                        "
                     >
-
                         <option value="All">All Risk</option>
                         <option value="Critical">Critical</option>
                         <option value="High">High</option>
                         <option value="Medium">Medium</option>
                         <option value="Low">Low</option>
-
                     </select>
 
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            </GlassCard>
 
-                    <table className="w-full">
+            {/* IOC Table */}
 
-                        <thead className="bg-slate-800 text-white">
+            <TableContainer>
+
+                <table className="w-full">
+
+                    <thead className="bg-slate-950 text-slate-300 uppercase tracking-wider">
+
+                        <tr>
+
+                            <th className="p-4">ID</th>
+                            <th className="p-4">Type</th>
+                            <th className="p-4">Value</th>
+                            <th className="p-4">Risk</th>
+                            <th className="p-4">Source</th>
+                            <th className="p-4">Status</th>
+                            <th className="p-4">Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {filteredIOCs.length > 0 ? (
+
+                            filteredIOCs.map((ioc, index) => (
+
+                                <motion.tr
+
+                                    key={ioc.id}
+
+                                    initial={{
+                                        opacity: 0,
+                                        y: 20,
+                                    }}
+
+                                    animate={{
+                                        opacity: 1,
+                                        y: 0,
+                                    }}
+
+                                    transition={{
+                                        delay: index * 0.05,
+                                    }}
+
+                                    className="
+                                        border-b
+                                        border-slate-800
+                                        text-center
+                                        text-slate-300
+                                        hover:bg-slate-800/40
+                                        transition-all
+                                        duration-300
+                                    "
+
+                                >
+
+                                    <td className="p-4">
+                                        {ioc.id}
+                                    </td>
+
+                                    <td className="p-4 font-semibold text-white">
+                                        {ioc.type}
+                                    </td>
+
+                                    <td className="p-4 break-all">
+                                        {ioc.value}
+                                    </td>
+
+                                    <td className="p-4">
+
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-sm font-semibold ${getRiskBadge(
+                                                ioc.riskLevel
+                                            )}`}
+                                        >
+                                            {ioc.riskLevel}
+                                        </span>
+
+                                    </td>
+
+                                    <td className="p-4">
+                                        {ioc.source}
+                                    </td>
+
+                                    <td className="p-4">
+
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(
+                                                ioc.status
+                                            )}`}
+                                        >
+                                            {ioc.status}
+                                        </span>
+
+                                    </td>
+
+                                    <td className="p-4">
+
+                                        <button
+                                            onClick={() =>
+                                                navigate(`/edit-ioc/${ioc.id}`)
+                                            }
+                                            className="
+                                                px-4
+                                                py-2
+                                                rounded-xl
+                                                bg-gradient-to-r
+                                                from-blue-600
+                                                to-cyan-500
+                                                text-white
+                                                mr-3
+                                                hover:scale-105
+                                                transition
+                                            "
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            onClick={() => deleteIOC(ioc.id)}
+                                            className="
+                                                px-4
+                                                py-2
+                                                rounded-xl
+                                                bg-gradient-to-r
+                                                from-red-600
+                                                to-red-500
+                                                text-white
+                                                hover:scale-105
+                                                transition
+                                            "
+                                        >
+                                            Delete
+                                        </button>
+
+                                    </td>
+
+                                </motion.tr>
+
+                            ))
+
+                        ) : (
 
                             <tr>
 
-                                <th className="p-4">ID</th>
-                                <th className="p-4">Type</th>
-                                <th className="p-4">Value</th>
-                                <th className="p-4">Risk</th>
-                                <th className="p-4">Source</th>
-                                <th className="p-4">Status</th>
-                                <th className="p-4">Action</th>
+                                <td
+                                    colSpan="7"
+                                    className="py-12 text-center text-slate-500"
+                                >
+                                    No IOC Found
+                                </td>
 
                             </tr>
 
-                        </thead>
+                        )}
 
-                        <tbody>
+                    </tbody>
 
-                            {filteredIOCs.length > 0 ? (
+                </table>
 
-                                filteredIOCs.map((ioc) => (
+            </TableContainer>
 
-                                    <tr
-                                        key={ioc.id}
-                                        className="border-b hover:bg-gray-50 text-center"
-                                    >
+        </div>
 
-                                        <td className="p-4">{ioc.id}</td>
+    </main>
 
-                                        <td className="p-4">{ioc.type}</td>
-
-                                        <td className="p-4">{ioc.value}</td>
-
-                                        <td className="p-4">
-
-                                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getRiskBadge(ioc.riskLevel)}`}>
-                                                {ioc.riskLevel}
-                                            </span>
-
-                                        </td>
-
-                                        <td className="p-4">{ioc.source}</td>
-
-                                        <td className="p-4">
-
-                                            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(ioc.status)}`}>
-                                                {ioc.status}
-                                            </span>
-
-                                        </td>
-
-                                        <td className="p-4">
-
-                                           <button
-                                                onClick={() => navigate(`/edit-ioc/${ioc.id}`)}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mr-2"
-                                            >
-                                                Edit
-                                            </button>
-
-                                           <button
-                                                onClick={() => deleteIOC(ioc.id)}
-                                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-                                            >
-                                                Delete
-                                            </button>
-
-                                        </td>
-
-                                    </tr>
-
-                                ))
-
-                            ) : (
-
-                                <tr>
-
-                                    <td
-                                        colSpan="7"
-                                        className="text-center p-6 text-gray-500"
-                                    >
-                                        No IOC Found
-                                    </td>
-
-                                </tr>
-
-                            )}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </main>
-
-        </>
-
-    );
+</>
+);
 
 }
 
