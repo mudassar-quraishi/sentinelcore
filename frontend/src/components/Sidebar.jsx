@@ -29,7 +29,7 @@ function Sidebar() {
       icon: <FaHome />,
       path: "/dashboard",
     },
-     {
+    {
       title: "Add Threat",
       icon: <FaPlusCircle />,
       path: "/add-threat",
@@ -40,7 +40,6 @@ function Sidebar() {
       icon: <FaShieldAlt />,
       path: "/threat-list",
     },
-   
     {
       title: "Add IOC",
       icon: <FaSearch />,
@@ -62,6 +61,16 @@ function Sidebar() {
       title: "Alert List",
       icon: <FaExclamationTriangle />,
       path: "/alert-list",
+    },
+    {
+      title: "Incident List",
+      icon: <FaShieldAlt />,
+      path: "/incidents",
+    },
+    {
+      title: "Playbooks",
+      icon: <FaCog />,
+      path: "/playbooks",
     },
     {
       title: "Users",

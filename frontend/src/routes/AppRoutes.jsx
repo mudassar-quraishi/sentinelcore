@@ -15,6 +15,9 @@ import UserList from "../pages/UserList";
 import AddUser from "../pages/AddUser";
 import EditUser from "../pages/EditUser";
 import Reports from "../pages/Reports";
+import IncidentList from "../pages/IncidentList";
+import PlaybookList from "../pages/PlaybookList";
+import PlaybookExecutionDetail from "../pages/PlaybookExecutionDetail";
 import ProtectedRoute from "./ProtectedRoute";
 
 const writeRoles = ["ADMIN", "ANALYST"];
@@ -44,6 +47,11 @@ function AppRoutes() {
         <Route path="/add-user" element={protect(<AddUser />, adminRoles)} />
         <Route path="/edit-user/:id" element={protect(<EditUser />, adminRoles)} />
         <Route path="/reports" element={protect(<Reports />)} />
+        
+        {/* Playbook and Incident Routes */}
+        <Route path="/incidents" element={protect(<IncidentList />)} />
+        <Route path="/playbooks" element={protect(<PlaybookList />)} />
+        <Route path="/playbooks/executions/:id" element={protect(<PlaybookExecutionDetail />)} />
       </Routes>
     </BrowserRouter>
   );
