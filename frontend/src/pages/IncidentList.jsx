@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaPlay, FaTrash, FaPlus, FaTimes, FaShieldAlt } from "react-icons/fa";
+import { FaPlay, FaTrash, FaPlus, FaTimes, FaShieldAlt, FaArrowUp, FaCheck, FaClock, FaEdit } from "react-icons/fa";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -222,6 +222,7 @@ function IncidentList() {
 
   // Create Incident Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [newIncident, setNewIncident] = useState({
     title: "",
     description: "",
@@ -231,6 +232,34 @@ function IncidentList() {
     source: "Manual",
     assignedToId: "",
   });
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+    setEditingId(null);
+    setNewIncident({
+      title: "",
+      description: "",
+      severity: "Medium",
+      priority: "P3",
+      status: "Open",
+      source: "Manual",
+      assignedToId: "",
+    });
+  };
+
+  const handleEditClick = (incident) => {
+    setEditingId(incident.id);
+    setNewIncident({
+      title: incident.title || "",
+      description: incident.description || "",
+      severity: incident.severity || "Medium",
+      priority: incident.priority || "P3",
+      status: incident.status || "Open",
+      source: incident.source || "Manual",
+      assignedToId: incident.assignedToId ? String(incident.assignedToId) : "",
+    });
+    setIsCreateModalOpen(true);
+  };
 
   // Run Playbook Modal State
   const [isPlaybookModalOpen, setIsPlaybookModalOpen] = useState(false);
@@ -293,21 +322,16 @@ function IncidentList() {
         ...newIncident,
         assignedToId: newIncident.assignedToId ? Number(newIncident.assignedToId) : null,
       };
-      await incidentService.createIncident(payload);
-      setIsCreateModalOpen(false);
-      setNewIncident({
-        title: "",
-        description: "",
-        severity: "Medium",
-        priority: "P3",
-        status: "Open",
-        source: "Manual",
-        assignedToId: "",
-      });
+      if (editingId) {
+        await incidentService.updateIncident(editingId, payload);
+      } else {
+        await incidentService.createIncident(payload);
+      }
+      closeCreateModal();
       fetchIncidents();
     } catch (error) {
-      console.error("Failed to create incident", error);
-      alert("Error creating incident ticket. Please check fields.");
+      console.error("Failed to save incident", error);
+      alert("Error saving incident ticket. Please check fields.");
     }
   };
 
@@ -472,7 +496,7 @@ function IncidentList() {
           {/* Incidents Table */}
           <TableContainer>
             <table className="w-full">
-              <thead className="bg-slate-900/60 text-slate-400 uppercase tracking-wider text-sm font-semibold">
+              <thead className="bg-slate-900/60 text-slate-400 uppercase tracking-wider text-sm font-semibold whitespace-nowrap">
                 <tr>
                   <th className="p-4 text-center">ID</th>
                   <th className="p-4 text-left">Incident Title</th>
@@ -528,7 +552,7 @@ function IncidentList() {
                         </span>
                       </td>
                       <td className="p-4 text-slate-400">{incident.source}</td>
-                      <td className="p-4">
+                      <td className="p-4 whitespace-nowrap">
                         {incident.assignedToName ? (
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs font-bold uppercase">
@@ -540,7 +564,7 @@ function IncidentList() {
                           <span className="text-slate-600 text-xs italic">Unassigned</span>
                         )}
                       </td>
-                      <td className="p-4 text-center">
+                      <td className="p-4 text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-3">
                           {canWrite && (() => {
                             const isClosedOrResolved = String(incident.status).toLowerCase() === "resolved" || String(incident.status).toLowerCase() === "closed";
@@ -587,6 +611,16 @@ function IncidentList() {
                                 >
                                   <FaCheck className="text-[10px]" /> Resolve
                                 </motion.button>
+
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => handleEditClick(incident)}
+                                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-500/10 hover:bg-sky-500 text-sky-400 hover:text-white border border-sky-500/20 transition-all duration-300"
+                                  title="Edit Incident"
+                                >
+                                  <FaEdit className="text-[10px]" /> Edit
+                                </motion.button>
                               </>
                             );
                           })()}
@@ -626,7 +660,7 @@ function IncidentList() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsCreateModalOpen(false)}
+              onClick={closeCreateModal}
               className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
             />
 
@@ -639,10 +673,10 @@ function IncidentList() {
             >
               <div className="p-6 border-b border-slate-800 flex justify-between items-center">
                 <h3 className="text-xl font-bold text-sky-400 flex items-center gap-2">
-                  🛡️ Create Security Incident
+                  🛡️ {editingId ? "Edit Security Incident" : "Create Security Incident"}
                 </h3>
                 <button
-                  onClick={() => setIsCreateModalOpen(false)}
+                  onClick={closeCreateModal}
                   className="text-slate-400 hover:text-white"
                 >
                   <FaTimes />
@@ -749,7 +783,7 @@ function IncidentList() {
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
                   <button
                     type="button"
-                    onClick={() => setIsCreateModalOpen(false)}
+                    onClick={closeCreateModal}
                     className="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all duration-300"
                   >
                     Cancel
@@ -758,7 +792,7 @@ function IncidentList() {
                     type="submit"
                     className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-sky-500/20 transition-all duration-300"
                   >
-                    Create Ticket
+                    {editingId ? "Save Changes" : "Create Ticket"}
                   </button>
                 </div>
               </form>
