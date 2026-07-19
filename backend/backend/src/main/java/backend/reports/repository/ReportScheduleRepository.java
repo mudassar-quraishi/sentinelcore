@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-@SuppressWarnings("null")
 public interface ReportScheduleRepository extends JpaRepository<ReportSchedule, Long> {
     List<ReportSchedule> findByActive(Boolean active);
 }

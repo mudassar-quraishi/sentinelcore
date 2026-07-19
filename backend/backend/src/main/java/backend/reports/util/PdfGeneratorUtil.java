@@ -3,7 +3,6 @@ package backend.reports.util;
 import backend.reports.dto.ReportRequest;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import com.itextpdf.text.pdf.qrcode.WriterException;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +29,7 @@ public class PdfGeneratorUtil {
             }
 
             // Setup Header, Footer, and Watermark page events
-            ReportPageEvents events = new ReportPageEvents(request.getWatermarkText(), generatedBy);
+            ReportPageEvents events = new ReportPageEvents(request.getWatermarkText());
             writer.setPageEvent(events);
 
             document.open();
@@ -167,11 +166,13 @@ public class PdfGeneratorUtil {
 
     private static PdfPCell createLogoCell() {
         // Create a stylized logo cell using drawing/fonts instead of image dependency
-        Paragraph logoText = new Paragraph("SENTINELCORE", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(41, 128, 185)));
+        Paragraph logoText = new Paragraph("SENTINELCORE",
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, new BaseColor(41, 128, 185)));
         logoText.setAlignment(Element.ALIGN_RIGHT);
-        Paragraph taglineText = new Paragraph("Threat Intelligence Platform", FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8, BaseColor.GRAY));
+        Paragraph taglineText = new Paragraph("Threat Intelligence Platform",
+                FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8, BaseColor.GRAY));
         taglineText.setAlignment(Element.ALIGN_RIGHT);
-        
+
         PdfPCell cell = new PdfPCell();
         cell.addElement(logoText);
         cell.addElement(taglineText);
@@ -184,17 +185,24 @@ public class PdfGeneratorUtil {
 
     private static String buildFilterSummary(ReportRequest request) {
         StringBuilder sb = new StringBuilder();
-        if (request.getStartDate() != null) sb.append("Start: ").append(request.getStartDate().toLocalDate()).append("\n");
-        if (request.getEndDate() != null) sb.append("End: ").append(request.getEndDate().toLocalDate()).append("\n");
-        if (request.getSeverity() != null && !request.getSeverity().isEmpty()) sb.append("Severity: ").append(request.getSeverity()).append("\n");
-        if (request.getIncidentType() != null && !request.getIncidentType().isEmpty()) sb.append("Type: ").append(request.getIncidentType()).append("\n");
-        if (request.getStatus() != null && !request.getStatus().isEmpty()) sb.append("Status: ").append(request.getStatus()).append("\n");
-        if (sb.length() == 0) return "All records (No filters applied)";
+        if (request.getStartDate() != null)
+            sb.append("Start: ").append(request.getStartDate().toLocalDate()).append("\n");
+        if (request.getEndDate() != null)
+            sb.append("End: ").append(request.getEndDate().toLocalDate()).append("\n");
+        if (request.getSeverity() != null && !request.getSeverity().isEmpty())
+            sb.append("Severity: ").append(request.getSeverity()).append("\n");
+        if (request.getIncidentType() != null && !request.getIncidentType().isEmpty())
+            sb.append("Type: ").append(request.getIncidentType()).append("\n");
+        if (request.getStatus() != null && !request.getStatus().isEmpty())
+            sb.append("Status: ").append(request.getStatus()).append("\n");
+        if (sb.length() == 0)
+            return "All records (No filters applied)";
         return sb.toString().trim();
     }
 
     private static PdfPTable createDataTable(String reportType, List<?> dataList, Font headerFont, Font textFont) {
-        // Build tables dynamically based on report types and reflect properties reflection
+        // Build tables dynamically based on report types and reflect properties
+        // reflection
         if (reportType.equalsIgnoreCase("incident")) {
             PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100);
@@ -203,7 +211,7 @@ public class PdfGeneratorUtil {
             table.addCell(createHeaderCell("Severity", headerFont));
             table.addCell(createHeaderCell("Status", headerFont));
             table.addCell(createHeaderCell("Created At", headerFont));
-            
+
             for (Object obj : dataList) {
                 // Dynamically fetch properties or cast
                 Map<?, ?> map = (Map<?, ?>) obj;
@@ -221,7 +229,7 @@ public class PdfGeneratorUtil {
             table.addCell(createHeaderCell("Name", headerFont));
             table.addCell(createHeaderCell("Severity", headerFont));
             table.addCell(createHeaderCell("Status", headerFont));
-            
+
             for (Object obj : dataList) {
                 Map<?, ?> map = (Map<?, ?>) obj;
                 table.addCell(createCell(String.valueOf(map.get("id")), textFont));
@@ -253,7 +261,7 @@ public class PdfGeneratorUtil {
             table.addCell(createHeaderCell("User", headerFont));
             table.addCell(createHeaderCell("Action", headerFont));
             table.addCell(createHeaderCell("Details", headerFont));
-            
+
             for (Object obj : dataList) {
                 Map<?, ?> map = (Map<?, ?>) obj;
                 table.addCell(createCell(String.valueOf(map.get("timestamp")), textFont));
@@ -282,17 +290,15 @@ public class PdfGeneratorUtil {
     // Header, Footer and Watermark Page Events Helper
     private static class ReportPageEvents extends PdfPageEventHelper {
         private final String watermarkText;
-        private final String generatedBy;
 
-        public ReportPageEvents(String watermarkText, String generatedBy) {
+        public ReportPageEvents(String watermarkText) {
             this.watermarkText = watermarkText;
-            this.generatedBy = generatedBy;
         }
 
         @Override
         public void onEndPage(PdfWriter writer, Document document) {
             PdfContentByte cb = writer.getDirectContentUnder();
-            
+
             // 1. Watermark
             if (watermarkText != null && !watermarkText.isEmpty()) {
                 cb.saveState();
@@ -318,10 +324,10 @@ public class PdfGeneratorUtil {
                 BaseFont bf = FontFactory.getFont(FontFactory.HELVETICA).getCalculatedBaseFont(false);
                 cbOver.setFontAndSize(bf, 8);
                 cbOver.setColorFill(BaseColor.GRAY);
-                
+
                 // Left aligned footer
                 cbOver.showTextAligned(Element.ALIGN_LEFT, "Internal Security Document - SentinelCore", 36, 20, 0);
-                
+
                 // Right aligned footer - Page Number
                 String pageNumStr = "Page " + writer.getPageNumber();
                 cbOver.showTextAligned(Element.ALIGN_RIGHT, pageNumStr, 559, 20, 0);

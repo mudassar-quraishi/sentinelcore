@@ -19,7 +19,6 @@ import java.util.Map;
         "http://localhost:5173",
         "http://localhost:5174"
 })
-@SuppressWarnings("null")
 public class ReportController {
 
     @Autowired
