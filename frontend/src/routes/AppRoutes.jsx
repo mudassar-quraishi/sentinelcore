@@ -27,6 +27,7 @@ import AddUser from "../pages/AddUser";
 import EditUser from "../pages/EditUser";
 
 import Reports from "../pages/Reports";
+import ReportsModule from "../modules/reports/ReportsModule";
 
 import VulnerabilityDashboard from "../pages/VulnerabilityDashboard";
 
@@ -170,6 +171,11 @@ function AppRoutes() {
                 <Route
                     path="/reports"
                     element={protect(<Reports />)}
+                />
+
+                <Route
+                    path="/new-reports"
+                    element={protect(<ReportsModule />)}
                 />
 
                 {/* Incident Management */}

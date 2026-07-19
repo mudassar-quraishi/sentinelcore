@@ -116,6 +116,12 @@ function Sidebar() {
       icon: <FaFileAlt />,
       path: "/reports",
     },
+    {
+      title: "Enterprise Reports",
+      icon: <FaFileAlt />,
+      path: "/new-reports",
+      roles: ["ADMIN", "ANALYST"],
+    },
   ];
 
   return (

@@ -15,6 +15,7 @@ public class BackendApplication {
 	}
 
 	@Bean
+	@SuppressWarnings("null")
 	CommandLineRunner ensureDefaultRoles(RoleRepository roleRepository, backend.service.VulnerabilityService vulnerabilityService) {
 		return args -> {
 			for (String roleName : new String[]{"ADMIN", "ANALYST"}) {

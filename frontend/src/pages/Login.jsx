@@ -39,6 +39,7 @@ function Login() {
       }
 
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
       localStorage.setItem("email", response.data.email);
       localStorage.setItem("role", response.data.role);
       localStorage.setItem("isLoggedIn", "true");
