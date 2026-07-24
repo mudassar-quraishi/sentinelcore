@@ -17,29 +17,24 @@ function AlertList() {
     const navigate = useNavigate();
 
     const [alerts, setAlerts] = useState([]);
-
     const [search, setSearch] = useState("");
-
     const [severityFilter, setSeverityFilter] = useState("All");
 
+    const role = localStorage.getItem("role");
+    const isAdmin = role === "ADMIN";
+    const canEdit = role === "ADMIN" || role === "ANALYST";
+
     useEffect(() => {
-
         fetchAlerts();
-
     }, []);
 
     const fetchAlerts = async () => {
 
         try {
-
             const response = await api.get("/alerts");
-
             setAlerts(response.data);
-
         } catch (error) {
-
             console.log(error);
-
         }
 
     };
@@ -52,14 +47,28 @@ function AlertList() {
         try {
 
             await api.delete(`/alerts/${id}`);
-
             fetchAlerts();
 
         } catch (error) {
 
             console.log(error);
-
             alert("Failed to Delete Alert");
+
+        }
+
+    };
+
+    const changeStatus = async (id, status) => {
+
+        try {
+
+            await api.put(`/alerts/${id}/status?status=${status}`);
+            fetchAlerts();
+
+        } catch (error) {
+
+            console.log(error);
+            alert("Failed to update status");
 
         }
 
@@ -107,9 +116,9 @@ function AlertList() {
         switch (status) {
 
             case "Open":
-                return "bg-blue-500/20 text-blue-400";
+                return "bg-red-500/20 text-red-400";
 
-            case "Investigating":
+            case "Acknowledged":
                 return "bg-yellow-500/20 text-yellow-300";
 
             case "Resolved":
@@ -122,248 +131,260 @@ function AlertList() {
 
     };
 
-    return (<>
-    <Navbar />
-    <Sidebar />
+    return (
+        <>
+            <Navbar />
+            <Sidebar />
 
-    <main className="ml-64 mt-16 min-h-screen bg-slate-950 relative overflow-hidden">
+            <main className="ml-64 mt-16 min-h-screen bg-slate-950 relative overflow-hidden">
 
-        <AnimatedBackground />
+                <AnimatedBackground />
 
-        <div className="relative z-10 p-8">
+                <div className="relative z-10 p-8">
 
-            <PageHeader
-                title="Alert Management"
-                subtitle="Monitor and manage security alerts"
-            />
-
-            {/* Search & Filter */}
-
-            <GlassCard className="p-6 mb-8">
-
-                <div className="flex flex-col lg:flex-row gap-5">
-
-                    <input
-                        type="text"
-                        placeholder="🔍 Search Alert..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="
-                            flex-1
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-xl
-                            px-5
-                            py-3
-                            text-white
-                            placeholder:text-slate-500
-                            focus:border-cyan-400
-                            focus:ring-2
-                            focus:ring-cyan-500/30
-                            outline-none
-                        "
+                    <PageHeader
+                        title="Alert Management"
+                        subtitle="Monitor and manage security alerts"
                     />
 
-                    <select
-                        value={severityFilter}
-                        onChange={(e) => setSeverityFilter(e.target.value)}
-                        className="
-                            w-full
-                            lg:w-60
-                            bg-slate-800
-                            border
-                            border-slate-700
-                            rounded-xl
-                            px-5
-                            py-3
-                            text-white
-                            focus:border-cyan-400
-                            outline-none
-                        "
-                    >
-                        <option value="All">All Severity</option>
-                        <option value="Critical">Critical</option>
-                        <option value="High">High</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Low">Low</option>
-                    </select>
+                    <GlassCard className="p-6 mb-8">
+
+                        <div className="flex flex-col lg:flex-row gap-5">
+
+                            <input
+                                type="text"
+                                placeholder="🔍 Search Alert..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="
+                                    flex-1
+                                    bg-slate-800
+                                    border
+                                    border-slate-700
+                                    rounded-xl
+                                    px-5
+                                    py-3
+                                    text-white
+                                    placeholder:text-slate-500
+                                    focus:border-cyan-400
+                                    focus:ring-2
+                                    focus:ring-cyan-500/30
+                                    outline-none
+                                "
+                            />
+
+                            <select
+                                value={severityFilter}
+                                onChange={(e) => setSeverityFilter(e.target.value)}
+                                className="
+                                    w-full
+                                    lg:w-60
+                                    bg-slate-800
+                                    border
+                                    border-slate-700
+                                    rounded-xl
+                                    px-5
+                                    py-3
+                                    text-white
+                                    focus:border-cyan-400
+                                    outline-none
+                                "
+                            >
+                                <option value="All">All Severity</option>
+                                <option value="Critical">Critical</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+
+                        </div>
+
+                    </GlassCard>
+
+                    <TableContainer>
+
+                        <table className="w-full">
+
+                            <thead className="bg-slate-950 text-slate-300 uppercase tracking-wider">
+
+                                <tr>
+
+                                    <th className="p-4">ID</th>
+                                    <th className="p-4">Title</th>
+                                    <th className="p-4">Severity</th>
+                                    <th className="p-4">Source</th>
+                                    <th className="p-4">Status</th>
+                                    <th className="p-4">Count</th>
+                                    <th className="p-4">Last Occurred</th>
+                                    <th className="p-4">Description</th>
+
+                                    {canEdit && (
+                                        <th className="p-4 w-80">
+                                            Actions
+                                        </th>
+                                    )}
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {filteredAlerts.length > 0 ? (
+
+                                    filteredAlerts.map((alert, index) => (
+
+                                        <motion.tr
+                                            key={alert.id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{
+                                                delay: index * 0.05,
+                                            }}
+                                            className="
+                                                border-b
+                                                border-slate-800
+                                                text-center
+                                                text-slate-300
+                                                hover:bg-slate-800/40
+                                                transition-all
+                                                duration-300
+                                            "
+                                        >
+
+                                            <td className="p-4">
+                                                {alert.id}
+                                            </td>
+
+                                            <td className="p-4 font-semibold text-white">
+                                                {alert.title}
+                                            </td>
+
+                                            <td className="p-4">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityBadge(alert.severity)}`}
+                                                >
+                                                    {alert.severity}
+                                                </span>
+                                            </td>
+
+                                            <td className="p-4">
+                                                {alert.source}
+                                            </td>
+
+                                            <td className="p-4">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(alert.status)}`}
+                                                >
+                                                    {alert.status}
+                                                </span>
+                                            </td>
+
+                                            <td className="p-4 font-semibold text-cyan-400">
+                                                {alert.occurrenceCount}
+                                            </td>
+
+                                            <td className="p-4 text-sm">
+                                                {alert.lastOccurred
+                                                    ? new Date(alert.lastOccurred).toLocaleString()
+                                                    : "-"}
+                                            </td>
+
+                                            <td className="p-4 max-w-xs truncate">
+                                                {alert.description}
+                                            </td>
+
+                                            {canEdit && (
+                                                <td className="p-4 whitespace-nowrap">                                                    {alert.status === "Open" && (
+                                                        <button
+                                                            onClick={() =>
+                                                                changeStatus(
+                                                                    alert.id,
+                                                                    "Acknowledged"
+                                                                )
+                                                            }
+                                                            className="px-3 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white mr-2"
+                                                        >
+                                                            Acknowledge
+                                                        </button>
+                                                    )}
+
+                                                    {alert.status ===
+                                                        "Acknowledged" && (
+                                                        <button
+                                                            onClick={() =>
+                                                                changeStatus(
+                                                                    alert.id,
+                                                                    "Resolved"
+                                                                )
+                                                            }
+                                                            className="px-3 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white mr-2"
+                                                        >
+                                                            Resolve
+                                                        </button>
+                                                    )}
+
+                                                    <button
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/edit-alert/${alert.id}`
+                                                            )
+                                                        }
+                                                        className="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white mr-2"
+                                                    >
+                                                        Edit
+                                                    </button>
+
+                                                    {isAdmin && (
+                                                        <button
+                                                            onClick={() =>
+                                                                deleteAlert(
+                                                                    alert.id
+                                                                )
+                                                            }
+                                                            className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            )}
+
+                                        </motion.tr>
+
+                                    ))
+
+                                ) : (
+
+                                    <tr>
+
+                                        <td
+                                            colSpan={
+                                                canEdit ? 9 : 8
+                                            }
+                                            className="py-12 text-center text-slate-500"
+                                        >
+                                            No Alerts Found
+                                        </td>
+
+                                    </tr>
+
+                                )}
+
+                            </tbody>
+
+                        </table>
+
+                    </TableContainer>
 
                 </div>
 
-            </GlassCard>
+            </main>
 
-            {/* Alert Table */}
-
-            <TableContainer>
-
-                <table className="w-full">
-
-                    <thead className="bg-slate-950 text-slate-300 uppercase tracking-wider">
-
-                        <tr>
-
-                            <th className="p-4">ID</th>
-                            <th className="p-4">Title</th>
-                            <th className="p-4">Severity</th>
-                            <th className="p-4">Source</th>
-                            <th className="p-4">Status</th>
-                            <th className="p-4">Description</th>
-                            <th className="p-4">Actions</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {filteredAlerts.length > 0 ? (
-
-                            filteredAlerts.map((alert, index) => (
-
-                                <motion.tr
-
-                                    key={alert.id}
-
-                                    initial={{ opacity: 0, y: 20 }}
-
-                                    animate={{ opacity: 1, y: 0 }}
-
-                                    transition={{
-                                        delay: index * 0.05,
-                                    }}
-
-                                    className="
-                                        border-b
-                                        border-slate-800
-                                        text-center
-                                        text-slate-300
-                                        hover:bg-slate-800/40
-                                        transition-all
-                                        duration-300
-                                    "
-
-                                >
-
-                                    <td className="p-4">
-
-                                        {alert.id}
-
-                                    </td>
-
-                                    <td className="p-4 font-semibold text-white">
-
-                                        {alert.title}
-
-                                    </td>
-
-                                    <td className="p-4">
-
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityBadge(alert.severity)}`}
-                                        >
-                                            {alert.severity}
-                                        </span>
-
-                                    </td>
-
-                                    <td className="p-4">
-
-                                        {alert.source}
-
-                                    </td>
-
-                                    <td className="p-4">
-
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(alert.status)}`}
-                                        >
-                                            {alert.status}
-                                        </span>
-
-                                    </td>
-
-                                    <td className="p-4 max-w-xs truncate">
-
-                                        {alert.description}
-
-                                    </td>
-
-                                    <td className="p-4">
-
-                                        <button
-                                            onClick={() =>
-                                                navigate(`/edit-alert/${alert.id}`)
-                                            }
-                                            className="
-                                                px-4
-                                                py-2
-                                                rounded-xl
-                                                bg-gradient-to-r
-                                                from-blue-600
-                                                to-cyan-500
-                                                text-white
-                                                mr-3
-                                                hover:scale-105
-                                                transition
-                                            "
-                                        >
-                                            Edit
-                                        </button>
-
-                                        <button
-                                            onClick={() =>
-                                                deleteAlert(alert.id)
-                                            }
-                                            className="
-                                                px-4
-                                                py-2
-                                                rounded-xl
-                                                bg-gradient-to-r
-                                                from-red-600
-                                                to-red-500
-                                                text-white
-                                                hover:scale-105
-                                                transition
-                                            "
-                                        >
-                                            Delete
-                                        </button>
-
-                                    </td>
-
-                                </motion.tr>
-
-                            ))
-
-                        ) : (
-
-                            <tr>
-
-                                <td
-                                    colSpan="7"
-                                    className="py-12 text-center text-slate-500"
-                                >
-                                    No Alerts Found
-                                </td>
-
-                            </tr>
-
-                        )}
-
-                    </tbody>
-
-                </table>
-
-            </TableContainer>
-
-        </div>
-
-    </main>
-
-</>
-);
+        </>
+    );
 
 }
 
 export default AlertList;
+                                                
